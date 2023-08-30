@@ -37,8 +37,8 @@ pipeline {
         steps {
             sh  """mvn sonar:sonar \
                    -Dsonar.projectKey=Maven-JavaWebApp \
-                   -Dsonar.host.url=http://172.31.5.173:9000 \
-                   -Dsonar.login=ed7f1ae74cf8b693cadbd47043d4b9ed5ef50913"""
+                   -Dsonar.host.url=http://172.31.12.227:9000 \
+                   -Dsonar.login=a040d936f00ce67e8bdf21ee2cecd6e237ddb236"""
         }
     }
     stage("Upload Artifact To Nexus"){
@@ -52,4 +52,12 @@ pipeline {
       }
     }
   }
-}
+  post {
+    always {
+        echo 'Slack Notifications.'
+        slackSend channel: '#cii-jenkins-master-client-alert', //update and provide your channel name
+        color: COLOR_MAP[currentBuild.currentResult],
+        message: "*${currentBuild.currentResult}:* Job Name '${env.JOB_NAME}' build ${env.BUILD_NUMBER} \n Build Timestamp: ${env.BUILD_TIMESTAMP} \n Project Workspace: ${env.WORKSPACE} \n More info at: ${env.BUILD_URL}"
+      }
+    }
+  }
